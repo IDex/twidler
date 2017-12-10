@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-group">
+    <label for="url-list">List of URLs</label>
+    <textarea class="form-control" id="url-list" rows="50" readonly>
+{{ urls }}
+    </textarea>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+{% if not session.twitter_oauth %}
+    <p>
+    Welcome to Twidler: Twitter Image URL Extractor, an app that allows one to bulk download images from your twitter favourites or from a specific user. To start allow the app to access twitter by clicking Login.
+    </p>
+{% endif %}
+{% if not session.twitter_oauth %}
+    <a href="/login" class="btn btn-info" role="button">Login</a>
+{% else %}
+    <form action="/url-fetch" method="post">
+    <div class="form-group">
+    <label for="inlineFormInputGroup">Screen name of the user</label>
+    <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+        <div class="input-group-addon">@</div>
+        <input type="text" class="form-control" id="inlineFormInputGroup" name="screen_name" placeholder="{{session.twitter_oauth.screen_name}}">
+    </div>
+    <div class="form-group">
+    <label for="select-tweet-type">Select types of tweets you want to get from the user</label>
+    <select class="form-control" id="select-tweet-type" name="tweet-type">
+      <option>favorites</option>
+      <option>tweets</option>
+    </select>
+    </div>
+    <p/>
+    <button type="submit" class="btn btn-primary">Fetch image URLs</button>
+    </form>
+{% endif %}
+{% endblock %}
+
