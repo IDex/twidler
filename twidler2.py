@@ -21,7 +21,7 @@ class TweetFetcher():
                  consumer_secret=None,
                  access_token_key=None,
                  access_token_secret=None,
-                 wait_time=5 * 60):
+                 wait_time=5):
         self.consumer_key = consumer_key or \
             'qOaSbnyDJ4NXcYQ3kzH2Uje9B'
         self.consumer_secret = consumer_secret or \
@@ -48,6 +48,8 @@ class TweetFetcher():
             types = dict(
                 home=partial(
                     self.api.GetHomeTimeline, since_id=self.last_tweet),
+                tweets=partial(
+                    self.api.GetUserTimeline, since_id=self.last_tweet),
                 favorites=partial(
                     self.api.GetFavorites,
                     since_id=self.last_tweet,
@@ -55,6 +57,7 @@ class TweetFetcher():
         else:
             types = dict(
                 home=self.api.GetHomeTimeline,
+                tweets=self.api.GetUserTimeline,
                 favorites=partial(self.api.GetFavorites, screen_name=user))
         try:
             res = types[timeline](count=200)
@@ -72,8 +75,9 @@ class TweetFetcher():
             if res:
                 response_total.extend(res)
             try:
-                res = types[timeline](count=200, max_id=res[-1].id)
+                res = types[timeline](user_id=user, count=200, max_id=res[-1].id)
                 res.pop(0)
+                print(len(res))
             except IndexError:
                 logger.info('No new tweets found.')
             except tw.TwitterError as e:
@@ -82,7 +86,7 @@ class TweetFetcher():
                 time.sleep(self.wait_time)
             logger.info(res)
             time.sleep(self.wait_time)
-            if not res:
+            if response_total:  # Early stop for debugging purposes
                 break
         self.tweets = response_total
         self._update_last_tweet()
